@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+
 void * context;
 
 struct arg_struct {
     void *subscriber;
     void *pusher;
 };
-
 
 char* concat(const char *s1, const char *s2)
 {
@@ -22,8 +22,9 @@ char* concat(const char *s1, const char *s2)
     return result;
 }
 
-void messageReader(void *subscriber)
+void messageReciever(void *arguments)
 {
+    struct arg_struct *argsWriter = arguments;
     while(1)
     {
         char string[1000] = "";
@@ -32,7 +33,7 @@ void messageReader(void *subscriber)
         zmq_msg_t msg;
 
         zmq_msg_init (&msg);
-        zmq_recvmsg (subscriber, &msg, 0);
+        zmq_recvmsg (argsWriter -> subscriber, &msg, 0);
         int size = zmq_msg_size (&msg);
         memcpy(string, zmq_msg_data(&msg), size);
         zmq_msg_close(&msg);
@@ -45,12 +46,22 @@ void messageReader(void *subscriber)
         printf("%s\n", parsedString);
         zmq_msg_close (&msg);
 
+        char* fullmessage = concat("hugohamblok>forwarder>", parsedString);
+
+        zmq_send( argsWriter -> pusher, fullmessage, strlen(fullmessage), 0 );
+
+        free(fullmessage);
+
     }
 }
 
-void *messageWriter(void *arguments)
+void messageForwarder(void)
 {
-    struct arg_struct *argsWriter = arguments;
+
+}
+
+void terminal(void)
+{
     char message[100];
     while (1)
     {
@@ -61,15 +72,11 @@ void *messageWriter(void *arguments)
             printf("Program terminated!\n");
             exit(0);
         }
-
-        char* fullmessage = concat("hugohamblok>reciever>", message);
-
-        zmq_send( argsWriter -> pusher, fullmessage, strlen(fullmessage), 0 );
-
-        free(fullmessage);
+        else {
+            printf("Unknown command\n");
+        }
     }
 }
-
 
 int main()
 {
@@ -87,21 +94,22 @@ int main()
         return EXIT_FAILURE;
     }
 
-    zmq_setsockopt(pusher,ZMQ_SUBSCRIBE,"hugohamblok>reciever>", 21);
-    zmq_setsockopt(subscriber,ZMQ_SUBSCRIBE,"hugohamblok>forwarder>", 22);
+    zmq_setsockopt(pusher,ZMQ_SUBSCRIBE,"hugohamblok>forwarder>", 22);
+    zmq_setsockopt(subscriber,ZMQ_SUBSCRIBE,"hugohamblok>reciever>", 21);
 
     printf("Enter <exit> to exit the program\n");
-    printf("Write a message!\n");
+    printf("Service running!\n");
 
     struct arg_struct argsWriter;
 
     argsWriter.pusher = pusher;
     argsWriter.subscriber = subscriber;
 
-    pthread_t thread1, thread2;
+    pthread_t thread1, thread2, thread3;
 
-    pthread_create(&thread1, NULL, messageReader, subscriber);
-    pthread_create(&thread2, NULL, messageWriter, (void *)&argsWriter);
+    pthread_create(&thread1, NULL, messageReciever, (void *)&argsWriter);
+    pthread_create(&thread2, NULL, messageForwarder, NULL);
+    pthread_create(&thread3, NULL, terminal, NULL);
 
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
