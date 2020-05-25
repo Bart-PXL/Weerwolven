@@ -55,11 +55,6 @@ void messageReciever(void *arguments)
     }
 }
 
-void messageForwarder(void)
-{
-
-}
-
 void terminal(void)
 {
     char message[100];
@@ -105,11 +100,10 @@ int main()
     argsWriter.pusher = pusher;
     argsWriter.subscriber = subscriber;
 
-    pthread_t thread1, thread2, thread3;
+    pthread_t thread1, thread2;
 
     pthread_create(&thread1, NULL, messageReciever, (void *)&argsWriter);
-    pthread_create(&thread2, NULL, messageForwarder, NULL);
-    pthread_create(&thread3, NULL, terminal, NULL);
+    pthread_create(&thread2, NULL, terminal, NULL);
 
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
