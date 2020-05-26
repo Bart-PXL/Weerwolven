@@ -107,7 +107,7 @@ int main()
 
         if (play)
         {
-            if (role == 0)
+            if (role == 0)                                                                  //code voor de burger
             {
                 switch (state)
                 {
@@ -205,7 +205,7 @@ int main()
                     break;
                 }
             }
-            else if (role == 1)
+            else if (role == 1)                                                             //code voor de weerwolf
             {
                 switch (state)
                 {
@@ -222,7 +222,7 @@ int main()
                             scanf("%d", &murder);
                         }
                         push.append("murder >");
-                        push.append("%d >", murder);
+                        push.append(to_string(murder));
                         strcpy(send, push.c_str());
                         zmq_send( pusher, send, strlen(send), 0 );
                         push = "weerwolven? >";
@@ -317,7 +317,7 @@ int main()
                     break;
                 }
             }
-            else if (role == 2)
+            else if (role == 2)                                                             //code voor de heks
             {
                 switch (state)
                 {
@@ -358,6 +358,10 @@ int main()
                         else if (keuzeheks == 3)
                         {
                             printf("U heeft gekozen om niks te doen.\n");
+                            push.append("niks >");
+                            strcpy(send, push.c_str());
+                            zmq_send( pusher, send, strlen(send), 0 );    //verzenden
+                            push = "weerwolven? >";
                         }
                         state++;
                     }
@@ -446,7 +450,7 @@ int main()
                     break;
                 }
             }
-            else if (role == 3)
+            else if (role == 3)                                                             //code voor cupido
             {
                 switch (state)
                 {

@@ -47,10 +47,14 @@ int main()
     bool play = false;
     bool cupido = false;
     bool weerwolf = false;
-    bool heks = false;
     int koppel1 = 0;
     int koppel2 = 0;
     int murder = 0;
+    int killheks = 0;
+    int counter = 0;
+    int votes [5][2];
+    int playerid = 0;
+    int vote = 0;
 
     player player1;
     player player2;
@@ -193,18 +197,76 @@ int main()
                 }
                 if (strcmp(command, "murder") == 0)
                 {
+                    push.append("next >");
+                    strcpy(send, push.c_str());
+                    zmq_send( pusher, send, strlen(send), 0 );
+                    push = "weerwolven! >";
                     sscanf(data, "%d", &murder);
-                    push.append("heks >%d", murder);
+                    push.append("heks >");
+                    push.append(to_string(murder));
                     strcpy(send, push.c_str());
                     zmq_send( pusher, send, strlen(send), 0 );
                     push = "weerwolven! >";
                     weerwolf = false;
+                    state = 1;
                 }
                 break;
             case 1:
+                if (strcmp(command, "heal") == 0)
+                {
+                    murder = 0;
+                    killheks = 0;
+
+                    push.append("vermoord >");
+                    push.append(to_string(murder));
+                    push.append(" >");
+                    push.append(to_string(killheks));
+                    strcpy(send, push.c_str());
+                    zmq_send( pusher, send, strlen(send), 0 );
+                    push = "weerwolven! >";
+
+                    state = 2;
+                }
+                else if (strcmp(command, "niks") == 0)
+                {
+                    push.append("vermoord >");
+                    push.append(to_string(murder));
+                    push.append(" >");
+                    push.append(to_string(killheks));
+                    strcpy(send, push.c_str());
+                    zmq_send( pusher, send, strlen(send), 0 );
+                    push = "weerwolven! >";
+
+                    state = 2;
+                }
+                else if (strcmp(command, "heks") == 0)
+                {
+                    sscanf(data, "%d", &killheks);
+
+                    push.append("vermoord >");
+                    push.append(to_string(murder));
+                    push.append(" >");
+                    push.append(to_string(killheks));
+                    strcpy(send, push.c_str());
+                    zmq_send( pusher, send, strlen(send), 0 );
+                    push = "weerwolven! >";
+
+                    state = 2;
+                }
+
 
                 break;
             case 2:
+                if (counter < 5)
+                {
+                    if (strcmp(command, "vote") == 0)
+                    {
+                        sscanf(data, "%d", &playerid);
+                        sscanf(data, "%d", &vote);
+                        votes[counter][0] = playerid;
+                        votes[counter][1] = playerid;
+                    }
+                }
 
                 break;
             case 3:
