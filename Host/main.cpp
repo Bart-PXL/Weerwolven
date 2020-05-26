@@ -45,9 +45,6 @@ int main()
     zmq_msg_t msg;
     int rc;
     int size;
-    int weerwolf;
-    int cupido;
-    int heks;
     int i = 0;
     char sub[11];
     while (i <= 4)
@@ -154,69 +151,7 @@ int main()
             break;
         }
     }
-
-    if (player1.role == 1)
-    {
-        weerwolf = 1;
-    }
-    else if (player2.role == 1)
-    {
-        weerwolf = 2;
-    }
-    else if (player3.role == 1)
-    {
-        weerwolf = 3;
-    }
-    else if (player4.role == 1)
-    {
-        weerwolf = 4;
-    }
-    else if (player5.role == 1)
-    {
-        weerwolf = 5;
-    }
-
-    if (player1.role == 2)
-    {
-        heks = 1;
-    }
-    else if (player2.role == 2)
-    {
-        heks = 2;
-    }
-    else if (player3.role == 2)
-    {
-        heks = 3;
-    }
-    else if (player4.role == 2)
-    {
-        heks = 4;
-    }
-    else if (player5.role == 2)
-    {
-        heks = 5;
-    }
-
-    if (player1.role == 3)
-    {
-        cupido = 1;
-    }
-    else if (player2.role == 3)
-    {
-        cupido = 2;
-    }
-    else if (player3.role == 3)
-    {
-        cupido = 3;
-    }
-    else if (player4.role == 3)
-    {
-        cupido = 4;
-    }
-    else if (player5.role == 3)
-    {
-        cupido = 5;
-    }
+    zmq_send( pusher, "weerwolven! >play >", 20, 0 );
 
     rc = zmq_msg_init (&msg);
     rc = zmq_recvmsg (subscriber, &msg, 0);
@@ -224,12 +159,12 @@ int main()
     memcpy(string, zmq_msg_data(&msg), size);
     zmq_msg_close(&msg);
     string[size] = 0;
-    printf("%s\n", string);
     zmq_msg_close (&msg);
     char command[20];
     int koppel1;
     int koppel2;
     sscanf(string, "%s >%s >%d >%d", sub, command, &koppel1, &koppel2);
+
 
     int kill;
     int killHeks;
@@ -331,7 +266,7 @@ int getRole()
         }
         else
         {
-            if (num == 0 && burger != true)
+            if (num == 0 && burger == false)
             {
                 duplicate = true;
                 burger = true;
