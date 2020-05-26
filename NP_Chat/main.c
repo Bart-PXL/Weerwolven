@@ -42,7 +42,11 @@ void messageReader(void *subscriber)
             parsedString = strdup(parse);
         }
 
-        printf("%s\n", parsedString);
+        if(strcmp("reciever", parsedString) != 0)
+        {
+            printf("%s\n", parsedString);
+        }
+
         zmq_msg_close (&msg);
 
     }
@@ -78,8 +82,8 @@ int main()
     void * pusher = zmq_socket(context, ZMQ_PUSH );
     void * subscriber = zmq_socket(context, ZMQ_SUB );
 
-    int socketp = zmq_connect( pusher, "tcp://localhost:24041" );
-    int sockets = zmq_connect( subscriber, "tcp://localhost:24042" );
+    int socketp = zmq_connect( pusher, "tcp://benternet.pxl-ea-ict.be:24041" );
+    int sockets = zmq_connect( subscriber, "tcp://benternet.pxl-ea-ict.be:24042" );
 
     if (socketp != 0 && sockets != 0)
     {
@@ -105,6 +109,7 @@ int main()
 
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
+
 
     return 0;
 }
